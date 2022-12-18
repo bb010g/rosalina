@@ -22,17 +22,13 @@ extern "C" fn main() -> ! {
 
     interrupts::disable();
     Exception::set_exception_handler(Exception::Decrementer, |_, _| {
-        unsafe {
-            write!(DOLPHIN_HLE, "Decrementer worked").ok();
-        }
+        write!(unsafe { &mut DOLPHIN_HLE }, "Decrementer worked").ok();
         Ok(())
     });
     decrementer_set(0xFF);
     interrupts::enable();
 
-    unsafe {
-        write!(DOLPHIN_HLE, "HELLO WORLD").ok();
-    }
+    write!(unsafe { &mut DOLPHIN_HLE }, "HELLO WORLD").ok();
 
     let mut vi = VideoSystem::new(ViFramebuffer::new(640, 480));
     let write_ptr = vi.framebuffer.data.as_mut_ptr().cast::<u16>();
@@ -47,16 +43,24 @@ extern "C" fn main() -> ! {
         }
 
         let diff = Instant::now().ticks.wrapping_sub(time);
-        unsafe {
-            write!(
-                DOLPHIN_HLE,
-                "Rendering takes {} millisecs",
-                Instant { ticks: diff }.millisecs()
-            )
-            .ok();
-            write!(DOLPHIN_HLE, "Monotick clock: {}", Instant::now().secs()).ok();
-            write!(DOLPHIN_HLE, "RTC clock: {}", ExternalInterface::get_rtc()).ok();
-        };
+        write!(
+            unsafe { &mut DOLPHIN_HLE },
+            "Rendering takes {} millisecs",
+            Instant { ticks: diff }.millisecs()
+        )
+        .ok();
+        write!(
+            unsafe { &mut DOLPHIN_HLE },
+            "Monotick clock: {}",
+            Instant::now().secs()
+        )
+        .ok();
+        write!(
+            unsafe { &mut DOLPHIN_HLE },
+            "RTC clock: {}",
+            ExternalInterface::get_rtc()
+        )
+        .ok();
 
         vi.wait_for_retrace();
     }
@@ -64,22 +68,18 @@ extern "C" fn main() -> ! {
 
 #[panic_handler]
 fn panic_handler(info: &PanicInfo) -> ! {
-    unsafe {
-        write!(DOLPHIN_HLE, "{}", info).ok();
-    }
+    write!(unsafe { &mut DOLPHIN_HLE }, "{}", info).ok();
     loop {}
 }
 
 #[alloc_error_handler]
 fn alloc_handler(layout: Layout) -> ! {
-    unsafe {
-        write!(
-            DOLPHIN_HLE,
-            "Failed to allocate item with \n Size: {}\n, Align: {}\n",
-            layout.size(),
-            layout.align()
-        )
-        .ok();
-    }
+    write!(
+        unsafe { &mut DOLPHIN_HLE },
+        "Failed to allocate item with \n Size: {}\n, Align: {}\n",
+        layout.size(),
+        layout.align()
+    )
+    .ok();
     panic!()
 }

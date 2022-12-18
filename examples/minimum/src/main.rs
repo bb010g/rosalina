@@ -28,6 +28,7 @@ fn alloc_handler(layout: Layout) -> ! {
         "Failed to allocate item with \n Size: {}\n, Align: {}\n",
         layout.size(),
         layout.align()
-    ).ok();
+    )
+    .ok();
     loop {}
 }

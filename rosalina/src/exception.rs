@@ -275,15 +275,13 @@ impl Exception {
     where
         F: Fn(usize, &ExceptionFrame) -> Result<(), &'static str> + Send + Sync + 'static,
     {
-        unsafe {
-            writeln!(
-                DOLPHIN_HLE,
-                "Registering {} exception handler at address: {:X?}",
-                exception,
-                exception.addr()
-            )
-            .ok();
-        }
+        writeln!(
+            unsafe { &mut DOLPHIN_HLE },
+            "Registering {} exception handler at address: {:X?}",
+            exception,
+            exception.addr()
+        )
+        .ok();
         EXCEPTION_TABLE[exception.id()].set(handler);
     }
 
@@ -302,78 +300,103 @@ pub fn default_exception_handler(
     exception_id: usize,
     frame: &ExceptionFrame,
 ) -> Result<(), &'static str> {
-    unsafe {
-        writeln!(
-            DOLPHIN_HLE,
-            "Exception {} has occured!",
-            Exception::from_id(exception_id).unwrap()
-        )
-        .ok();
+    writeln!(
+        unsafe { &mut DOLPHIN_HLE },
+        "Exception {} has occured!",
+        Exception::from_id(exception_id).unwrap()
+    )
+    .ok();
 
-        // PRINT REGISTERS
-        writeln!(
-            DOLPHIN_HLE,
-            "GPR00 {:X?}, GPR08 {:X?}, GPR16 {:X?}, GPR24: {:X?}",
-            frame.gprs[0], frame.gprs[8], frame.gprs[16], frame.gprs[24]
-        )
-        .ok();
-        writeln!(
-            DOLPHIN_HLE,
-            "GPR01 {:X?}, GPR09 {:X?}, GPR17 {:X?}, GPR25: {:X?}",
-            frame.gprs[1], frame.gprs[9], frame.gprs[17], frame.gprs[25]
-        )
-        .ok();
-        writeln!(
-            DOLPHIN_HLE,
-            "GPR02 {:X?}, GPR10 {:X?}, GPR18 {:X?}, GPR26: {:X?}",
-            frame.gprs[2], frame.gprs[10], frame.gprs[18], frame.gprs[26]
-        )
-        .ok();
-        writeln!(
-            DOLPHIN_HLE,
-            "GPR03 {:X?}, GPR11 {:X?}, GPR19 {:X?}, GPR27: {:X?}",
-            frame.gprs[3], frame.gprs[11], frame.gprs[19], frame.gprs[27]
-        )
-        .ok();
-        writeln!(
-            DOLPHIN_HLE,
-            "GPR04 {:X?}, GPR12 {:X?}, GPR20 {:X?}, GPR28: {:X?}",
-            frame.gprs[4], frame.gprs[12], frame.gprs[20], frame.gprs[28]
-        )
-        .ok();
-        writeln!(
-            DOLPHIN_HLE,
-            "GPR05 {:X?}, GPR13 {:X?}, GPR21 {:X?}, GPR29: {:X?}",
-            frame.gprs[5], frame.gprs[13], frame.gprs[21], frame.gprs[29]
-        )
-        .ok();
-        writeln!(
-            DOLPHIN_HLE,
-            "GPR06 {:X?}, GPR14 {:X?}, GPR22 {:X?}, GPR30: {:X?}",
-            frame.gprs[6], frame.gprs[14], frame.gprs[22], frame.gprs[30]
-        )
-        .ok();
-        writeln!(
-            DOLPHIN_HLE,
-            "GPR07 {:X?}, GPR15 {:X?}, GPR23 {:X?}, GPR31: {:X?}",
-            frame.gprs[7], frame.gprs[15], frame.gprs[23], frame.gprs[31]
-        )
-        .ok();
+    // PRINT REGISTERS
+    writeln!(
+        unsafe { &mut DOLPHIN_HLE },
+        "GPR00 {:X?}, GPR08 {:X?}, GPR16 {:X?}, GPR24: {:X?}",
+        frame.gprs[0],
+        frame.gprs[8],
+        frame.gprs[16],
+        frame.gprs[24]
+    )
+    .ok();
+    writeln!(
+        unsafe { &mut DOLPHIN_HLE },
+        "GPR01 {:X?}, GPR09 {:X?}, GPR17 {:X?}, GPR25: {:X?}",
+        frame.gprs[1],
+        frame.gprs[9],
+        frame.gprs[17],
+        frame.gprs[25]
+    )
+    .ok();
+    writeln!(
+        unsafe { &mut DOLPHIN_HLE },
+        "GPR02 {:X?}, GPR10 {:X?}, GPR18 {:X?}, GPR26: {:X?}",
+        frame.gprs[2],
+        frame.gprs[10],
+        frame.gprs[18],
+        frame.gprs[26]
+    )
+    .ok();
+    writeln!(
+        unsafe { &mut DOLPHIN_HLE },
+        "GPR03 {:X?}, GPR11 {:X?}, GPR19 {:X?}, GPR27: {:X?}",
+        frame.gprs[3],
+        frame.gprs[11],
+        frame.gprs[19],
+        frame.gprs[27]
+    )
+    .ok();
+    writeln!(
+        unsafe { &mut DOLPHIN_HLE },
+        "GPR04 {:X?}, GPR12 {:X?}, GPR20 {:X?}, GPR28: {:X?}",
+        frame.gprs[4],
+        frame.gprs[12],
+        frame.gprs[20],
+        frame.gprs[28]
+    )
+    .ok();
+    writeln!(
+        unsafe { &mut DOLPHIN_HLE },
+        "GPR05 {:X?}, GPR13 {:X?}, GPR21 {:X?}, GPR29: {:X?}",
+        frame.gprs[5],
+        frame.gprs[13],
+        frame.gprs[21],
+        frame.gprs[29]
+    )
+    .ok();
+    writeln!(
+        unsafe { &mut DOLPHIN_HLE },
+        "GPR06 {:X?}, GPR14 {:X?}, GPR22 {:X?}, GPR30: {:X?}",
+        frame.gprs[6],
+        frame.gprs[14],
+        frame.gprs[22],
+        frame.gprs[30]
+    )
+    .ok();
+    writeln!(
+        unsafe { &mut DOLPHIN_HLE },
+        "GPR07 {:X?}, GPR15 {:X?}, GPR23 {:X?}, GPR31: {:X?}",
+        frame.gprs[7],
+        frame.gprs[15],
+        frame.gprs[23],
+        frame.gprs[31]
+    )
+    .ok();
 
-        writeln!(
-            DOLPHIN_HLE,
-            "LR: {:X?}, SRR0: {:X?}, SRR1: {:X?}, MSR: {:X?}",
-            frame.lr, frame.srr0, frame.srr1, frame.msr
-        )
-        .ok();
-        writeln!(
-            DOLPHIN_HLE,
-            "DAR: {:X?}, DSISR: {:X?}",
-            frame.dar,
-            mfspr(18)
-        )
-        .ok();
-    }
+    writeln!(
+        unsafe { &mut DOLPHIN_HLE },
+        "LR: {:X?}, SRR0: {:X?}, SRR1: {:X?}, MSR: {:X?}",
+        frame.lr,
+        frame.srr0,
+        frame.srr1,
+        frame.msr
+    )
+    .ok();
+    writeln!(
+        unsafe { &mut DOLPHIN_HLE },
+        "DAR: {:X?}, DSISR: {:X?}",
+        frame.dar,
+        mfspr(18)
+    )
+    .ok();
     Err("An Unrecoverable exception occured!")
 }
 

@@ -62,9 +62,12 @@ impl Interrupt {
     where
         F: Fn(usize) -> Result<(), &'static str> + Send + Sync + 'static,
     {
-        unsafe {
-            writeln!(DOLPHIN_HLE, "Registering {} interrupt handler", interrupt).ok();
-        }
+        writeln!(
+            unsafe { &mut DOLPHIN_HLE },
+            "Registering {} interrupt handler",
+            interrupt
+        )
+        .ok();
         INTERRUPT_TABLE[interrupt.id()].set(handler);
     }
 
