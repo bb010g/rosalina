@@ -4,9 +4,9 @@
 
 extern crate alloc;
 
-use core::{alloc::Layout, panic::PanicInfo};
+use core::{alloc::Layout, fmt::Write, panic::PanicInfo};
 
-use rosalina::{os::OS, print};
+use rosalina::{os::OS, DOLPHIN_HLE};
 
 #[no_mangle]
 extern "C" fn main() -> ! {
@@ -17,16 +17,17 @@ extern "C" fn main() -> ! {
 
 #[panic_handler]
 fn panic_handler(info: &PanicInfo) -> ! {
-    print!("{}", info);
+    write!(unsafe { &mut DOLPHIN_HLE }, "{}", info).ok();
     loop {}
 }
 
 #[alloc_error_handler]
 fn alloc_handler(layout: Layout) -> ! {
-    print!(
+    write!(
+        unsafe { &mut DOLPHIN_HLE },
         "Failed to allocate item with \n Size: {}\n, Align: {}\n",
         layout.size(),
         layout.align()
-    );
+    ).ok();
     loop {}
 }
