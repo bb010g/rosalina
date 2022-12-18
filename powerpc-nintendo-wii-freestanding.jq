@@ -1,20 +1,19 @@
+#!/usr/bin/env bash
+# (lovely hack, isn't this) \
+exec jq -n --rawfile linker_script "${0%.jq}-linker-script.ld" -f "$0" > "${0%.jq}.json"
 {
     "arch": "powerpc",
     "cpu": "750",
     "data-layout": "E-m:e-p:32:32-i64:64-n32",
     "dynamic-linking": false,
-    "env": "newlib",
     "exe-suffix": ".elf",
     "executables": true,
     "has-rpath": true,
-    "llvm-target": "powerpc-eabi",
-    "linker": "powerpc-eabi-gcc",
-    "linker-flavor": "gcc",
-    "linker-is-gnu": true,
+    "llvm-target": "powerpc-unknown-none-eabihf",
+    "linker": "rust-lld",
+    "link-script": $linker_script,
+    "linker-flavor": "ld.lld",
     "os": "revolution",
-    "pre-link-args": {
-        "gcc": ["-meabi", "-mhard-float"]
-    },
     "panic-strategy": "abort",
     "relocation-model": "static",
     "target-endian": "big",
@@ -24,4 +23,3 @@
     "target-pointer-width": "32",
     "vendor": "nintendo"
 }
-

@@ -1,11 +1,11 @@
-OUTPUT_FORMAT("elf32-powerpc", "elf32-powerpc", "elf32-powerpc");
+OUTPUT_FORMAT(elf32-powerpc);
 OUTPUT_ARCH(powerpc:common);
 
 ENTRY(__start)
 
 SECTIONS {
   . = 0x00003400;
-  
+
   .stub : {
     KEEP(*(.stub));
   } :stub = 0
@@ -13,51 +13,44 @@ SECTIONS {
   . = 0x80004000;
 
   .text : {
-      *(.text)
-      *(.text.*)
+      *(.text .text.*)
       . = ALIGN(32);
   }
 
   .rodata : {
-    *(.rodata)
-    *(.rodata.*)
+    *(.rodata .rodata.*)
     . = ALIGN(32);
   }
 
   .data : {
-    *(.data)
-    *(.data.*)
+    *(.data .data.*)
     . = ALIGN(32);
   }
 
   .bss : {
     __bss_start = .;
-    *(.bss)
-    *(.bss.*)
+    *(.bss .bss.*)
     . = ALIGN(32);
     __bss_end = .;
-  }   
+  }
   .sdata : {
       PROVIDE(SDA_BASE = .);
-      *(.sdata)
-      *(.sdata.*)
+      *(.sdata .sdata.*)
       .  = ALIGN(32);
   }
 
   .sdata2 : {
       PROVIDE(SDA2_BASE = .);
-      *(.sdata2)
-      *(.sdata2.*)
+      *(.sdata2 .sdata2.*)
       . = ALIGN(32);
   }
 
   .sbss : {
     __sbss_start = .;
-    *(.sbss)
-    *(.sbss.*)
+    *(.sbss .sbss.*)
     . = ALIGN(32);
-    __sbss_end = .; 
-  } 
+    __sbss_end = .;
+  }
 
   /* debugging sections */
   /* Stabs */
@@ -90,9 +83,17 @@ SECTIONS {
   .debug_funcnames 0 : { *(.debug_funcnames) }
   .debug_typenames 0 : { *(.debug_typenames) }
   .debug_varnames  0 : { *(.debug_varnames) }
+  /* DWARF 3 */
+  .debug_pubtypes  0 : { *(.debug_pubtypes) }
+  .debug_ranges    0 : { *(.debug_ranges) }
 
-  /* discard anything not already mentioned */
-  /DISCARD/ : { *(*) }  
+  /* (required by lld?) */
+  .symtab            : { *(.symtab .symtab.*) }
+  .strtab            : { *(.strtab .strtab.*) }
+  /* section names (required by lld) */
+  .shstrtab          : { *(.shstrtab .shstrtab.*) }
+  /* discard anything not already mentioned (crashes lld) */
+  /* /DISCARD/          : { *(*) } */
 }
 
 __stack_addr = (__bss_start + SIZEOF(.bss) + 0x200000 + 7) & (-8);
