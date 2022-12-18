@@ -1,10 +1,13 @@
 [workspace]
 members = [
-    "examples/*",
+    "cargo-luma",
+    "examples/wii/basic",
+    "examples/wii/minimum",
     "rosalina",
 ]
 
 [workspace.dependencies]
+cargo-luma = { path = "cargo-luma" }
 rosalina = { path = "rosalina" }
 
 [profile.dev]
@@ -13,3 +16,8 @@ panic = "abort"
 [profile.release]
 opt-level = "s"
 panic = "abort"
+
+[profile.host-release]
+inherits = "release"
+opt-level = 3
+panic = "unwind"
